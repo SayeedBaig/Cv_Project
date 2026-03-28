@@ -1,3 +1,4 @@
+```md
 # Week 1 Notes
 
 ## What We Did
@@ -17,42 +18,3 @@
 
 ## Status
 ✅ Week 1 Completed Successfully
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- What to repeat daily
-Every time you finish coding:
-
-git status → check changes
-
-git add . → stage them
-
-git commit -m "Your update message" → commit
-
-git push origin main → push -->
