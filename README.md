@@ -32,3 +32,17 @@ docs/ → Documentation
 ```bash
 cd backend
 python app.py
+
+## 🤖 Week 2 – AI Integration
+
+- Integrated YOLOv8 (Ultralytics)
+- Real-time object detection implemented
+- Bounding boxes and labels displayed
+- Modular detection pipeline created
+
+### 🔍 How It Works
+1. Webcam captures live frames
+2. Frames passed to YOLO model
+3. Objects detected (person, car, etc.)
+4. Bounding boxes drawn on frame
+5. Output displayed in real-time
