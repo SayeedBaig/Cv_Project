@@ -18,9 +18,13 @@ def start_camera(source=0):
 
             frame = cv2.resize(frame, (640, 480))
 
-            processed_frame = detect_objects(frame)
-
-            cv2.imshow("YOLO Multi-Model Detection", processed_frame)
+            frame, objects, potholes, glare, decisions = detect_objects(frame)
+            y_offset = 30
+            for decision in decisions:
+                cv2.putText(frame, decision, (10, y_offset),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                y_offset += 30
+            cv2.imshow("YOLO Multi-Model Detection", frame)
 
             if cv2.waitKey(1) & 0xFF == 27:
                 break
