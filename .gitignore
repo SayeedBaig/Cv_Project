@@ -1,13 +1,23 @@
+# Python
 __pycache__/
 *.pyc
-.env
 venv/
+.venv/
+
+# Environment variables
+.env
+
+# Node
 node_modules/
+
+# Build
+dist/
+build/
+
+# OS
 .DS_Store
 
-datasets/
-.venv/
-__pycache__/
-*.pyc
-runs/
-.cache/
+# Temp files
+temp_*.mp4
+output_*.mp4
+*.log

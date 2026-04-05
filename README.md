@@ -196,4 +196,4 @@ The system successfully:
  Week-3 successfully implemented a custom AI-based pothole detection system using YOLOv8. The integration of both general and custom models resulted in a multi-functional intelligent detection system.
 
 This forms a strong foundation for further enhancements in Week-4 and Week-5.
->>>>>>> 4353189bd8dc2d5b8dd397881f650ea8008cb1b7
+
