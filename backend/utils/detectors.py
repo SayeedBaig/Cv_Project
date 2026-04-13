@@ -19,6 +19,7 @@ POTHOLE_MODEL_PATH = os.path.join(
 # Load models
 general_model = YOLO(GENERAL_MODEL_PATH)
 pothole_model = YOLO(POTHOLE_MODEL_PATH)
+DETECTION_CONFIDENCE_THRESHOLD = 0.5
 
 def detect_objects(frame):
     detected_objects = []
@@ -33,13 +34,18 @@ def detect_objects(frame):
         label = general_model.names[int(box.cls[0])]
         conf = float(box.conf[0])
 
+        if conf < DETECTION_CONFIDENCE_THRESHOLD:
+            continue
+
         detected_objects.append({
             "label": label,
             "box": [x1, y1, x2, y2],
+            "confidence": conf,
         })
         detected_boxes.append({
             "label": label,
             "box": [x1, y1, x2, y2],
+            "confidence": conf,
         })
 
         cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
@@ -55,10 +61,14 @@ def detect_objects(frame):
         x1, y1, x2, y2 = map(int, box.xyxy[0])
         conf = float(box.conf[0])
 
+        if conf < DETECTION_CONFIDENCE_THRESHOLD:
+            continue
+
         potholes.append("pothole")
         detected_boxes.append({
             "label": "pothole",
             "box": [x1, y1, x2, y2],
+            "confidence": conf,
         })
 
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)

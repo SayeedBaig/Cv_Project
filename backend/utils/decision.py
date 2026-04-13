@@ -1,20 +1,33 @@
-def make_decision(objects, potholes, glare):
-    decisions = []
+def make_decision(objects, potholes=None, glare=False):
+    detections = []
 
-    # Beam control
-    if glare:
-        decisions.append("LOW BEAM")
-    else:
-        decisions.append("HIGH BEAM")
+    for obj in objects or []:
+        if isinstance(obj, dict):
+            label = obj.get("label")
+        else:
+            label = obj
 
-    # Alerts
+        if label:
+            detections.append(label)
+
     if potholes:
-        decisions.append("POTHOLE ALERT")
+        detections.append("pothole")
 
-    for obj in objects:
-        if obj in ["person"]:
-            decisions.append("PEDESTRIAN WARNING")
-        if obj in ["car", "truck", "bus", "motorbike"]:
-            decisions.append("VEHICLE AHEAD")
+    if "person" in detections:
+        alert = "Pedestrian detected"
+        recommendation = "Slow down and prepare to stop"
+    elif "pothole" in detections:
+        alert = "Pothole detected ahead"
+        recommendation = "Slow down to avoid damage"
+    elif "chair" in detections or "obstacle" in detections:
+        alert = "Obstacle detected"
+        recommendation = "Proceed with caution"
+    else:
+        alert = "No hazards"
+        recommendation = "Drive safely"
 
-    return decisions
+    return {
+        "detections": detections,
+        "alert": alert,
+        "recommendation": recommendation,
+    }

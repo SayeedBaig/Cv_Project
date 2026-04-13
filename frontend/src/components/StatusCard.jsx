@@ -52,11 +52,11 @@ function StatusCard({ data }) {
     },
     {
       title: "System Status",
-      status: data?.decision || "No data available",
+      status: data?.decision || "Safe",
       color:
-        data?.decision === "Danger"
+        data?.pothole
           ? "red"
-          : data?.decision === "Warning"
+          : data?.pedestrian || data?.glare || data?.decision === "Caution" || data?.decision === "Warning"
             ? "yellow"
             : "green",
     },

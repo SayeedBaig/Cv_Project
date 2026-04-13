@@ -15,7 +15,7 @@ VIDEO_DETECTION_INTERVAL = 5
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def generate_frames():
+def generate_frames(scene_mode="driving"):
     try:
         while True:
             frame = get_frame("webcam")
@@ -24,7 +24,9 @@ def generate_frames():
                 time.sleep(0.03)
                 continue
 
-            result = process_frame(frame)
+            frame = cv2.resize(frame, (640, 480))
+            result = process_frame(frame, mode=scene_mode)
+            draw_detection_overlay(frame, result)
             label = result.get("decision", "Live Feed")
 
             cv2.putText(
@@ -37,16 +39,18 @@ def generate_frames():
                 2,
             )
 
-            ret, buffer = cv2.imencode(".jpg", frame)
+            ret, buffer = cv2.imencode(
+                ".jpg",
+                frame,
+                [int(cv2.IMWRITE_JPEG_QUALITY), 70],
+            )
             if not ret:
                 time.sleep(0.03)
                 continue
 
-            frame_bytes = buffer.tobytes()
-
             yield (
                 b"--frame\r\n"
-                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n" + buffer.tobytes() + b"\r\n"
             )
 
             time.sleep(0.03)
@@ -60,15 +64,16 @@ def draw_detection_overlay(frame, result):
     for obj in overlay_boxes:
         x1, y1, x2, y2 = obj["box"]
         label = obj["label"]
+        color = (0, 0, 255) if label == "pothole" else (0, 255, 0)
 
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
         cv2.putText(
             frame,
             label,
             (x1, max(y1 - 10, 20)),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.6,
-            (0, 255, 0),
+            color,
             2,
         )
 
@@ -77,6 +82,7 @@ def draw_detection_overlay(frame, result):
 def detect():
     try:
         frame = get_frame("webcam")
+        scene_mode = request.args.get("mode", "driving")
 
         if frame is None:
             return jsonify({
@@ -84,7 +90,7 @@ def detect():
                 "message": "Camera not available"
             }), 500
 
-        result = process_frame(frame)
+        result = process_frame(frame, mode=scene_mode)
 
         return jsonify(result)
 
@@ -111,8 +117,9 @@ def stop_camera():
 
 @detection_bp.route("/video_feed")
 def video_feed():
+    scene_mode = request.args.get("mode", "driving")
     return Response(
-        generate_frames(),
+        generate_frames(scene_mode),
         mimetype="multipart/x-mixed-replace; boundary=frame",
     )
 
@@ -130,7 +137,8 @@ def upload_image():
     if frame is None:
         return {"success": False, "message": "Invalid image"}, 400
 
-    result = process_frame(frame)
+    scene_mode = request.form.get("mode", "driving")
+    result = process_frame(frame, mode=scene_mode)
     draw_detection_overlay(frame, result)
 
     _, buffer = cv2.imencode(".jpg", frame)
@@ -145,6 +153,7 @@ def upload_video():
         return {"success": False, "message": "No file"}, 400
 
     file = request.files["file"]
+    scene_mode = request.form.get("mode", "driving")
 
     input_filename = f"temp_{uuid.uuid4()}.mp4"
     output_filename = f"output_{uuid.uuid4()}.mp4"
@@ -193,7 +202,7 @@ def upload_video():
 
             frame = cv2.resize(frame, (640, 480))
             if frame_index % VIDEO_DETECTION_INTERVAL == 0:
-                last_result = process_frame(frame)
+                last_result = process_frame(frame, mode=scene_mode)
 
             for key in summary:
                 if last_result.get(key):

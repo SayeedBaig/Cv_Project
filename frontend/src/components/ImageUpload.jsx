@@ -25,11 +25,17 @@ function ImageUpload({ onResult }) {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-
-      const response = await fetch("http://localhost:5000/api/upload-image", {
+      let response = await fetch("http://localhost:5000/api/detect-image", {
         method: "POST",
         body: formData,
       });
+
+      if (response.status === 404) {
+        response = await fetch("http://localhost:5000/api/upload-image", {
+          method: "POST",
+          body: formData,
+        });
+      }
 
       const data = await response.json();
 

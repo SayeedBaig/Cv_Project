@@ -25,11 +25,17 @@ function VideoUpload({ onResult }) {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-
-      const response = await fetch("http://localhost:5000/api/upload-video", {
+      let response = await fetch("http://localhost:5000/api/detect-video", {
         method: "POST",
         body: formData,
       });
+
+      if (response.status === 404) {
+        response = await fetch("http://localhost:5000/api/upload-video", {
+          method: "POST",
+          body: formData,
+        });
+      }
 
       const data = await response.json();
 

@@ -31,24 +31,32 @@ function AlertsPanel({ data }) {
             blink: false,
           };
 
+  const alertClasses =
+    alert.color === "red"
+      ? "border-red-500/30 bg-red-500/10"
+      : alert.color === "yellow"
+        ? "border-yellow-500/30 bg-yellow-500/10"
+        : "border-green-500/30 bg-green-500/10";
+
+  const dotClasses =
+    alert.color === "red"
+      ? "bg-red-500"
+      : alert.color === "yellow"
+        ? "bg-yellow-500"
+        : "bg-green-500";
+
   return (
-    <div
-      className={`rounded-xl border bg-gray-900 p-4 ${
-        alert.color === "red"
-          ? "border-red-500/30"
-          : alert.color === "yellow"
-            ? "border-yellow-500/30"
-            : "border-green-500/30"
-      }`}
-    >
+    <div className={`rounded-xl border p-4 ${alertClasses}`}>
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="font-semibold text-white">{alert.title}</p>
           <p className="text-sm text-gray-400">{alert.desc}</p>
         </div>
 
-        {alert.blink && (
-          <div className="h-3 w-3 rounded-full bg-red-500 animate-ping" />
+        {alert.blink ? (
+          <div className={`h-3 w-3 rounded-full ${dotClasses} animate-ping`} />
+        ) : (
+          <div className={`h-3 w-3 rounded-full ${dotClasses}`} />
         )}
       </div>
     </div>
